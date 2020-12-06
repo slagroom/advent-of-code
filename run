@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+
+if [ "$#" != "1" ]; then
+    echo "usage: run <solution-dir>" >&2
+    exit 1
+fi
+
+targetDir="$1"
+
+if [ ! -d "$targetDir" ]; then
+    echo "err: couldn't find solution directory '$targetDir'" >&2
+    exit 1
+fi
+
+if [ ! -f "$targetDir/Dockerfile" ]; then
+    echo "err: solution directory "$targetDir" has no Dockerfile" >&2
+    exit 1
+fi
+
+img=$(docker build -q "$targetDir")
+if [ $? -ne 0 ]; then
+    echo "err: failed to build Docker image from '$targetDir'" >&2
+    exit 1
+fi
+
+dayDir=$(dirname $targetDir)
+
+cat "$dayDir/input.txt" | docker container run --rm -i "$img"
+if [ $? -ne 0 ]; then
+    echo "err: failed to run Docker container from image '$img'" >&2
+fi
+
+docker image rm "$img" 1>/dev/null
+if [ $? -ne 0 ]; then
+    echo "err: failed to remove Docker image '$img'" >&2
+    exit 1
+fi
+
