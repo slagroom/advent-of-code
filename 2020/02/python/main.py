@@ -24,6 +24,5 @@ for line in map(lambda l: l.rstrip(), sys.stdin):
         if len(password) > (second-1) and password[second-1] == char:
             validPart2 += 1
 
-
 print(f'part 1: {validPart1}')
 print(f'part 2: {validPart2}')
